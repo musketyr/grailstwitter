@@ -2,23 +2,25 @@ buildscript {
     repositories {
         mavenLocal()
         maven { url "https://repo.grails.org/grails/core" }
+        maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.11.6"
         classpath "org.grails.plugins:hibernate5:6.0.4"
+        classpath "gradle.plugin.fi.evident.gradle.beanstalk:gradle-beanstalk-plugin:0.1.1"
     }
 }
 
-version "0.1"
+version "0.1.0-SNAPSHOT"
 group "twitter"
 
 apply plugin: "eclipse"
 apply plugin: "idea"
-apply plugin: "war"
 apply plugin: "org.grails.grails-web"
 apply plugin: "org.grails.grails-gsp"
 apply plugin: "asset-pipeline"
+apply plugin: "fi.evident.beanstalk"
 
 repositories {
     mavenLocal()
@@ -71,4 +73,19 @@ bootRun {
 assets {
     minifyJs = true
     minifyCss = true
+}
+
+jar.finalizedBy bootRepackage
+
+beanstalk {
+    s3Endpoint = "s3-eu-west-1.amazonaws.com"
+    beanstalkEndpoint = "elasticbeanstalk.eu-west-1.amazonaws.com"
+
+    deployments {
+        staging {
+            war = tasks.jar
+            application = 'grails-twitter-demo'
+            environment = 'grails-twitter-jar'
+        }
+    }
 }

@@ -77,13 +77,18 @@ assets {
 
 jar.finalizedBy bootRepackage
 
+task beanstalkArchive(type: Zip, dependsOn: jar) {
+    from 'src/main/eb'
+    from tasks.jar
+}
+
 beanstalk {
     s3Endpoint = "s3-eu-west-1.amazonaws.com"
     beanstalkEndpoint = "elasticbeanstalk.eu-west-1.amazonaws.com"
 
     deployments {
         staging {
-            war = tasks.jar
+            war = tasks.beanstalkArchive
             application = 'grails-twitter-demo'
             environment = 'grails-twitter-jar'
         }
